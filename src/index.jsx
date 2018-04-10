@@ -5,7 +5,7 @@ import { createStore } from 'redux'
 
 import * as types from './actions'
 
-import Contacts from './components/Contacts'
+import Contacts from './components/Contacts.jsx'
 
 const initialState = {
     contacts: [

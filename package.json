@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack -d",
+    "build": "webpack -p",
     "start": "webpack-dev-server --open -d"
   },
   "keywords": [],
@@ -23,6 +23,8 @@
     "webpack-dev-server": "^3.1.1"
   },
   "dependencies": {
+    "express": "^4.16.3",
+    "mongoose": "^5.0.13",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
     "react-redux": "^5.0.7",
