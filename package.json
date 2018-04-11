@@ -5,8 +5,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack -p",
-    "start": "webpack-dev-server --open -d"
+    "start": "webpack-dev-server --open -d",
+    "serve": "nodemon .\\server\\server.js"
   },
+  "proxy": "http://localhost:3000/",
   "keywords": [],
   "author": "smakhl",
   "license": "ISC",
@@ -18,11 +20,13 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "html-webpack-plugin": "^3.2.0",
+    "nodemon": "^1.17.3",
     "webpack": "^4.5.0",
     "webpack-cli": "^2.0.14",
     "webpack-dev-server": "^3.1.1"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "mongoose": "^5.0.13",
     "react": "^16.3.1",

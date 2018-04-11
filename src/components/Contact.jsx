@@ -11,7 +11,7 @@ const Contact = ({ name = 'Имя', jobTitle = "Профессия", phoneNumber
                         <p className="card-text">{jobTitle}, {company}</p>
                         <div>
                             <a href="#" className="btn btn-primary btn-sm" style={{marginRight: 5+'px'}}>Edit</a>
-                            <a href="#" className="btn btn-primary btn-sm">Edit</a>
+                            <a href="#" className="btn btn-danger btn-sm">Remove</a>
                         </div>
                     </div>
                 </div>
