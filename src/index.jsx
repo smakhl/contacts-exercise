@@ -5,23 +5,24 @@ import { createStore } from 'redux'
 
 import * as types from './actions'
 
-import Contacts from './components/Contacts.jsx'
+import ContactsList from './components/ContactsList.jsx'
 
 const initialState = {
-    contacts: [
-        {
-            name: 'user'
-        },
-        {
-            name: 'user2'
-        }
-    ]
+    contacts: []
 }
 
 const contactsReducer = (state = initialState, action) => {
     switch (action.type) {
         case types.ADD_CONTACT:
-            return {...state, contacts: [...state.contacts, {name: action.name}] };
+            return {
+                ...state,
+                contacts: [...state.contacts, { name: action.name }]
+            };
+        case 'LOAD_CONTACTS':
+            return {
+                ...state,
+                contacts: [...state.contacts, ...action.contacts]
+            };
         default:
             return state;
     }
@@ -34,30 +35,29 @@ store.subscribe(() => {
 });
 
 class App extends React.Component {
+    componentDidMount() {
+        fetch("/api/contacts")
+            .then(r => {
+                r.json().then(loadedData => {
+                    store.dispatch({
+                        type: 'LOAD_CONTACTS',
+                        contacts: loadedData
+                    })
+                })
+            })
+            .catch(err => console.error(err))
+    }
+
     render() {
         return (
             <div className="container">
-                <div className="row">
-                    <div className="col-xs-10 col-xs-offset-1">
-                        <div>Добавить контакт</div>
-                        <Contacts />
-                    </div>
-                </div>
+                Add contact
                 <hr />
+                <ContactsList />
             </div>
         )
     }
 }
-
-store.dispatch({
-    type: types.ADD_CONTACT,
-    name: 'jack'
-});
-
-store.dispatch({
-    type: types.ADD_CONTACT,
-    name: 'jill'
-});
 
 ReactDOM.render(
     <Provider store={store}>

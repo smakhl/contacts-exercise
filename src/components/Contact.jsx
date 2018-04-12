@@ -1,19 +1,16 @@
 import React from 'react'
 
-const Contact = ({ name = 'Имя', jobTitle = "Профессия", phoneNumber = "Номер телефона", company = "Компания", photoUrl = '', likes }) => {
+const Contact = (props) => {
     return (
-        <div className="card">
+        <div className="card mb-3">
+            <div className="card-header">
+                {props.contact.name}
+            </div>
             <div className="card-body">
-                <div className="row">
-                    <div className="col-sm"><img src={photoUrl} alt={photoUrl} /></div>
-                    <div>
-                        <h5 className="card-title">{name}</h5>
-                        <p className="card-text">{jobTitle}, {company}</p>
-                        <div>
-                            <a href="#" className="btn btn-primary btn-sm" style={{marginRight: 5+'px'}}>Edit</a>
-                            <a href="#" className="btn btn-danger btn-sm">Remove</a>
-                        </div>
-                    </div>
+                <p className="card-text">{props.contact.company}, {props.contact.jobTitle}</p>
+                <div>
+                    <a href="#" className="btn btn-primary btn-sm" style={{ marginRight: 5 + 'px' }}>Edit</a>
+                    <a href="#" className="btn btn-danger btn-sm">Remove</a>
                 </div>
             </div>
         </div>
