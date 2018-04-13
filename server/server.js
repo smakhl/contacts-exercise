@@ -15,7 +15,10 @@ const Like = require('./models').Like;
 
 app.use(express.static(path.resolve(__dirname, '../dist/')));
 
-mongoose.connect(connectionString)
+mongoose.connect(connectionString, {
+    connectTimeoutMS: 5000,
+    socketTimeoutMS: 5000
+})
     .then(() => console.log('Successfully connected to DB'))
     .catch((err) => console.error(err));
 

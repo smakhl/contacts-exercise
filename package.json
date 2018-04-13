@@ -26,11 +26,13 @@
     "webpack-dev-server": "^3.1.1"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "mongoose": "^5.0.13",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
+    "react-icons": "^2.2.7",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "redux-saga": "^0.16.0"
