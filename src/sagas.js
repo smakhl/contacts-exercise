@@ -33,6 +33,16 @@ function* fetchContactDetails(action) {
     }
 }
 
+function* addContact(action) {
+    try {
+        // console.log('fetchContactDetails',action.contactId)
+        const data = yield call([axios, axios.post], "/api/contacts/" + action.newContact)
+        yield put({ type: types.ADD_CONTACT_SUCCEEDED, contact: data.data })
+    } catch (error) {
+        yield put({ type: types.ADD_CONTACT_FAILED, error })
+    }
+}
+
 function* watchFetchContacts() {
     yield takeLatest(types.FETCH_CONTACTS_REQUESTED, fetchContacts)
 }
@@ -45,10 +55,15 @@ function* watchFetchContactDetails() {
     yield takeLatest(types.FETCH_CONTACT_DETAILS_REQUESTED, fetchContactDetails)
 }
 
+function* watchAddContact() {
+    yield takeLatest(types.ADD_CONTACT_REQUESTED, addContact)
+}
+
 export default function* rootSaga() {
     yield all([
         watchFetchContacts(),
         watchDeleteContact(),
-        watchFetchContactDetails()
+        watchFetchContactDetails(),
+        watchAddContact()
     ])
 }

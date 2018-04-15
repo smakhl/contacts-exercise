@@ -9,6 +9,7 @@ class Contact extends React.Component {
         super(props);
         // this.handleEditClick = this.handleEditClick.bind(this);
         // this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        console.log('contact page', this.props.match.params.id)
         this.props.dispatch({
             type: types.FETCH_CONTACT_DETAILS_REQUESTED,
             contactId: this.props.match.params.id
@@ -22,12 +23,19 @@ class Contact extends React.Component {
     // handleEditClick() {
     //     this.props.onEdit(this.props.contact)
     // }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.openContact._id != this.props.match.params.id) {
+            this.props.dispatch({
+                type: types.FETCH_CONTACT_DETAILS_REQUESTED,
+                contactId: this.props.match.params.id
+            })
+        }
+    }
 
-    // componentDidMount() {
- 
-    // }
 
     render() {
+
+
         return (
             <div>
                 {this.props.fetching ?

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 import ContactListItem from './ContactListItem.jsx';
 import { connect } from 'react-redux';
 import * as types from '../actionTypes'
@@ -30,7 +31,7 @@ class ContactsList extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.addContact}>Добавить контакт</button>
+                <Link className="btn btn-primary" to={'/contact/add'}>Добавить контакт</Link>
                 <hr />
                 {this.props.fetching ?
                     <h4>Загрузка...</h4> :

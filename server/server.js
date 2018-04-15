@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -6,8 +7,6 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json());
 const path = require('path')
 
-const connectionString = require('../configs/dbConfig').connectionString;
-
 // models
 const Contact = require('./models').Contact;
 const Comment = require('./models').Comment;
@@ -15,7 +14,7 @@ const Like = require('./models').Like;
 
 app.use(express.static(path.resolve(__dirname, '../dist/')));
 
-mongoose.connect(connectionString, {
+mongoose.connect(process.env.MONGODB_URL, {
     connectTimeoutMS: 5000,
     socketTimeoutMS: 5000
 })
@@ -24,10 +23,6 @@ mongoose.connect(connectionString, {
 
 app.listen(port, function () {
     console.log(`listening on ${port}`)
-})
-
-app.get('/', function (req, res) {
-    res.sendFile(path.resolve(__dirname, '../dist/index.html'))
 })
 
 app.get('/api/contacts', function (req, res) {
@@ -83,3 +78,7 @@ app.post('/api/likes/:id', function (req, res) {
         })
         .catch((err) => res.status(400).send(err));
 }) 
+
+app.get('*', function (req, res) {
+    res.sendFile(path.resolve(__dirname, '../dist/index.html'))
+})

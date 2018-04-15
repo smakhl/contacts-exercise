@@ -15,6 +15,23 @@ export default (state = initialState, action) => {
                 ...state,
                 contacts: [...state.contacts, action.newContact]
             };
+        case types.ADD_CONTACT_REQUESTED:
+            return {
+                ...state,
+                fetching: true
+            };
+        case types.ADD_CONTACT_SUCCEEDED:
+            return {
+                ...state,
+                fetching: false,
+                contacts: [...state.contacts, action.newContact]
+            };
+        case types.ADD_CONTACT_FAILED:
+            return {
+                ...state,
+                fetching: false,
+                error: action.error
+            };
         case types.FETCH_CONTACTS_SUCCEEDED:
             return {
                 ...state,
