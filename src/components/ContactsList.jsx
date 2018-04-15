@@ -1,23 +1,18 @@
 import React from 'react';
-import Contact from './Contact.jsx';
+import ContactListItem from './ContactListItem.jsx';
 import { connect } from 'react-redux';
 import * as types from '../actionTypes'
 
 class ContactsList extends React.Component {
-    constructor(){
+    constructor() {
         super()
         this.onContactDelete = this.onContactDelete.bind(this)
-    }
-
-    componentDidMount() {
-        this.props.dispatch({
-            type: types.FETCH_CONTACTS_REQUESTED
-        })
+        this.onContactEdit = this.onContactEdit.bind(this)
     }
 
     onContactDelete(contact) {
-        console.log('onContactDelete',contact)
-        if (confirm(`Вы уверены, что хотите удалить ${contact.name}?`)){
+        console.log('onContactDelete', contact)
+        if (confirm(`Вы уверены, что хотите удалить ${contact.name}?`)) {
             this.props.dispatch({
                 type: types.DELETE_CONTACT_REQUESTED,
                 contactId: contact._id
@@ -26,7 +21,7 @@ class ContactsList extends React.Component {
     }
 
     onContactEdit(contact) {
-        console.log('onContactEdit',contact)
+        console.log('onContactEdit', contact)
         // this.props.dispatch({
         //     type: types.REMOVE_CONTACT
         // })
@@ -35,6 +30,8 @@ class ContactsList extends React.Component {
     render() {
         return (
             <div>
+                <button onClick={this.addContact}>Добавить контакт</button>
+                <hr />
                 {this.props.fetching ?
                     <h4>Загрузка...</h4> :
                     this.props.error ?
@@ -43,7 +40,7 @@ class ContactsList extends React.Component {
                             <p>{this.props.error.message}</p>
                         </div>
                         :
-                        this.props.contacts.map(co => <Contact contact={co} key={co._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />)
+                        this.props.contacts.map(co => <ContactListItem contact={co} key={co._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />)
                 }
             </div>
         )

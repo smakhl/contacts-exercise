@@ -38,6 +38,9 @@ app.get('/api/contacts', function (req, res) {
 
 app.get('/api/contacts/:id', function (req, res) {
     Contact.findById(req.params.id)
+        .populate('likes')
+        .populate('comments')
+        .populate('by')
         .then(contact => { res.send(contact) })
         .catch((err) => res.send(err));
 })

@@ -1,45 +1,82 @@
 import React from 'react'
 import FaThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import FaComment from 'react-icons/lib/fa/comment';
+import { connect } from 'react-redux';
+import * as types from '../actionTypes'
 
 class Contact extends React.Component {
     constructor(props) {
-        super(props)
-
-        this.handleEditClick = this.handleEditClick.bind(this)
-        this.handleDeleteClick = this.handleDeleteClick.bind(this)
+        super(props);
+        // this.handleEditClick = this.handleEditClick.bind(this);
+        // this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        this.props.dispatch({
+            type: types.FETCH_CONTACT_DETAILS_REQUESTED,
+            contactId: this.props.match.params.id
+        })
     }
 
-    handleDeleteClick() {
-        this.props.onDelete(this.props.contact)
-    }
+    // handleDeleteClick() {
+    //     this.props.onDelete(this.props.contact)
+    // }
 
-    handleEditClick() {
-        this.props.onEdit(this.props.contact)
-    }
+    // handleEditClick() {
+    //     this.props.onEdit(this.props.contact)
+    // }
+
+    // componentDidMount() {
+ 
+    // }
 
     render() {
         return (
-            <div className="card mb-3">
-                <div className="card-header">
-                    {this.props.contact.name}
-                </div>
-                <div className="card-body">
-                    <p className="card-text">{this.props.contact.company}, {this.props.contact.jobTitle}</p>
-                    <div>
-                        <a href="#" onClick={this.handleEditClick} className="btn btn-primary btn-sm">Редактировать</a>
-                        {' '}
-                        <a href="#" onClick={this.handleDeleteClick} className="btn btn-danger btn-sm">Удалить</a>
-                        {' '}
-                        <a href="#" onClick={this.handleDeleteClick} className="btn btn-default btn-sm"><FaThumbsUp /> {this.props.contact.likes.length}</a>
-                        {' '}
-                        <a href="#" onClick={this.handleDeleteClick} className="btn btn-default btn-sm"><FaComment /> {this.props.contact.comments.length}</a>
-                    </div>
-                </div>
+            <div>
+                {this.props.fetching ?
+                    <h4>Загрузка...</h4> :
+                    this.props.error ?
+                        <div>
+                            <h4>Ошибка подключения</h4>
+                            <p>{this.props.error.message}</p>
+                        </div>
+                        :
+                        <div>
+                            <h3>{this.props.openContact.name}</h3>
+                            <hr />
+                            <dl className="row">
+                                <dt className="col-sm-3">Компания</dt>
+                                <dd className="col-sm-9">{this.props.openContact.company}</dd>
+                                <dt className="col-sm-3">Должность</dt>
+                                <dd className="col-sm-9">{this.props.openContact.jobTitle}</dd>
+                                <dt className="col-sm-3">ID</dt>
+                                <dd className="col-sm-9">{this.props.match.params.id}</dd>
+                                <dt className="col-sm-3">Лайки</dt>
+                                <dd className="col-sm-9">{this.props.openContact.likes && this.props.openContact.likes.length}</dd>
+                            </dl>
+                            <div>
+                                <hr />
+                                <h6>Комментарии</h6>
+                                <ul className="list-group">
+                                    <li className="list-group-item">
+                                        <textarea className="form-control" type="text" />
+                                        <button className="btn btn-primary btn-sm float-right mt-2">Отправить</button>
+                                    </li>
+                                    {this.props.openContact.comments && this.props.openContact.comments.map(com =>
+                                        <li className="list-group-item" key={com._id}>
+                                            {com.text}
+                                            <footer className="blockquote-footer text-right">{com.by}</footer>
+                                        </li>)}
+                                </ul>
+                            </div>
+                        </div>
+                }
             </div>
         )
     }
 }
 
+const mapStateToProps = (state) => ({
+    openContact: state.openContact,
+    fetching: state.fetching,
+    error: state.error
+})
 
-export default Contact;
+export default connect(mapStateToProps)(Contact);
