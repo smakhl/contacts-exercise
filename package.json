@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack -p",
     "start": "webpack-dev-server --open -d",
-    "serve": "nodemon .\\server\\server.js"
+    "serve": "nodemon .\\server\\server.js",
+    "postinstall": "webpack -p"
   },
   "proxy": "http://localhost:3000/",
   "keywords": [],
