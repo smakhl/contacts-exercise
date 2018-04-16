@@ -95,29 +95,31 @@ class Contact extends React.Component {
                                 <ul className="list-group">
                                     <li className="list-group-item">
                                         <form>
-                                            <textarea className="form-control" type="text" value={this.state.comment} onChange={this.handleCommentChange} />
-                                            <input type="submit" value="Отправить" onClick={this.handleSubmit} className="btn btn-primary btn-sm float-right mt-2" />
+                                            <fieldset disabled={this.state.posting ? "disabled" : ""}>
+                                                <textarea className="form-control" type="text" value={this.state.comment} onChange={this.handleCommentChange} />
+                                                <input type="submit" value="Отправить" onClick={this.handleSubmit} className="btn btn-primary btn-sm float-right mt-2" />
+                                            </fieldset>
                                         </form>
                                     </li>
-                                    {this.props.openContact.comments && this.props.openContact.comments.map(com =>
-                                        <li className="list-group-item" key={com._id}>
-                                            {com.text}
-                                            <footer className="blockquote-footer text-right">{com.by.name}</footer>
-                                        </li>)}
+                                        {this.props.openContact.comments && this.props.openContact.comments.map(com =>
+                                            <li className="list-group-item" key={com._id}>
+                                                {com.text}
+                                                <footer className="blockquote-footer text-right">{com.by.name}</footer>
+                                            </li>)}
                                 </ul>
                             </div>
-                        </div>
-                }
+                            </div>
+                            }
             </div>
         )
-    }
-}
-
+                }
+            }
+            
 const mapStateToProps = (state) => ({
-    openContact: state.openContact,
-    fetching: state.fetching,
-    error: state.error,
-    currentUser: state.currentUser
-})
-
+                    openContact: state.openContact,
+                fetching: state.fetching,
+                error: state.error,
+                currentUser: state.currentUser
+            })
+            
 export default connect(mapStateToProps)(Contact);
