@@ -34,7 +34,7 @@ export default class ContactListItem extends React.Component {
                         {' '}
                         <a href="#" onClick={this.handleDeleteClick} className="btn btn-default btn-sm"><FaThumbsUp /> {this.props.contact.likes.length}</a>
                         {' '}
-                        <a href="#" onClick={this.handleDeleteClick} className="btn btn-default btn-sm"><FaComment /> {this.props.contact.comments.length}</a>
+                        <a href="#" className="btn btn-default btn-sm"><FaComment /> {this.props.contact.comments.length}</a>
                     </div>
                 </div>
             </div>

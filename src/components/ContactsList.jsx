@@ -41,7 +41,13 @@ class ContactsList extends React.Component {
                             <p>{this.props.error.message}</p>
                         </div>
                         :
-                        this.props.contacts.map(co => <ContactListItem contact={co} key={co._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />)
+                        this.props.contacts
+                            .sort((a, b) => {
+                                var textA = a.name.toUpperCase();
+                                var textB = b.name.toUpperCase();
+                                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            })
+                            .map(co => <ContactListItem contact={co} key={co._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />)
                 }
             </div>
         )

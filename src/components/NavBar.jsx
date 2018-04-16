@@ -25,7 +25,7 @@ export default ({ currentUser }) => {
                         <a className="nav-link disabled" href="#">Disabled</a>
                     </li> */}
                 </ul>
-                {currentUser && <Link className="navbar-text" to={"/contact/" + currentUser._id}>{currentUser.name}</Link>}
+                {currentUser && <span className="navbar-text">Пользователь: {currentUser.name}</span>}
             </div>
 
         </nav>)

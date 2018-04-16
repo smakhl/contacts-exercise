@@ -37,7 +37,7 @@ export default (state = initialState, action) => {
                 ...state,
                 fetching: false,
                 contacts: action.contacts,
-                currentUser: action.contacts[0]
+                currentUser: action.contacts[action.contacts.length - 1]
             };
         case types.FETCH_CONTACTS_REQUESTED:
             return {
@@ -56,6 +56,7 @@ export default (state = initialState, action) => {
                 contacts: state.contacts.filter(co => co._id != action.contactId)
             };
         case types.FETCH_CONTACT_DETAILS_REQUESTED:
+            console.log('FETCH_CONTACT_DETAILS_REQUESTED')
             return {
                 ...state,
                 fetching: true
@@ -71,6 +72,21 @@ export default (state = initialState, action) => {
                 ...state,
                 fetching: false,
                 error: action.error
+            };
+        case types.COMMENT_CONTACT:
+            const openContact = {
+                ...state.openContact,
+                comments: [...state.openContact.comments, { ...action.comment, by: { name: state.currentUser.name } }]
+            }
+            const contacts = [...state.contacts.filter(co => co._id != openContact._id), openContact]
+            return {
+                ...state,
+                openContact,
+                contacts
+            };
+        case types.LIKE_CONTACT:
+            return {
+                ...state
             };
         default:
             return state;

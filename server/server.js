@@ -34,8 +34,14 @@ app.get('/api/contacts', function (req, res) {
 app.get('/api/contacts/:id', function (req, res) {
     Contact.findById(req.params.id)
         .populate('likes')
-        .populate('comments')
-        .populate('by')
+        .populate({ 
+            path: 'comments', 
+            populate: {
+                path: 'by',
+                model: 'Contact',
+                select: 'name'
+            }
+        })
         .then(contact => { res.send(contact) })
         .catch((err) => res.send(err));
 })
@@ -59,6 +65,7 @@ app.post('/api/contacts', function (req, res) {
         .catch((err) => res.status(400).send(err));
 })
 
+// creates new comment. Pass contact's ID as param. Returns contact
 app.post('/api/comments/:id', function (req, res) {
     new Comment(req.body)
         .save()
@@ -69,6 +76,7 @@ app.post('/api/comments/:id', function (req, res) {
         .catch((err) => res.status(400).send(err));
 })
 
+// creates new like. Pass contact's ID as param. Returns contact
 app.post('/api/likes/:id', function (req, res) {
     new Like(req.body)
         .save()

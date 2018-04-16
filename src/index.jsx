@@ -16,9 +16,9 @@ const sagaMiddleware = createSagaMiddleware()
 const store = createStore(contactsReducer, applyMiddleware(sagaMiddleware))
 sagaMiddleware.run(rootSaga)
 
-// store.subscribe(() => {
-//     console.log("Store updated!", store.getState());
-// });
+store.subscribe(() => {
+    console.log("Store updated!", store.getState());
+});
 
 
 ReactDOM.render(
