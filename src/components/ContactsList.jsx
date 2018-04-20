@@ -33,7 +33,7 @@ class ContactsList extends React.Component {
             <div>
                 <Link className="btn btn-primary" to={'/contact/add'}>Добавить контакт</Link>
                 <hr />
-                {this.props.fetching ?
+                {this.props.loading ?
                     <h4>Загрузка...</h4> :
                     this.props.error ?
                         <div>
@@ -41,13 +41,16 @@ class ContactsList extends React.Component {
                             <p>{this.props.error.message}</p>
                         </div>
                         :
-                        this.props.contacts
-                            .sort((a, b) => {
-                                var textA = a.name.toUpperCase();
-                                var textB = b.name.toUpperCase();
-                                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                        this.props.contacts.result
+                            // .sort((a, b) => {
+                            //     var textA = a.name.toUpperCase();
+                            //     var textB = b.name.toUpperCase();
+                            //     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                            // })
+                            .map(co => {
+                                const contact = this.props.contacts.entities.contacts[co];
+                                return <ContactListItem contact={contact} key={contact._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />
                             })
-                            .map(co => <ContactListItem contact={co} key={co._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />)
                 }
             </div>
         )
@@ -56,7 +59,7 @@ class ContactsList extends React.Component {
 
 const mapStateToProps = (state) => ({
     contacts: state.contacts,
-    fetching: state.fetching,
+    loading: state.loading,
     error: state.error
 })
 

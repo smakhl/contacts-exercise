@@ -1,11 +1,11 @@
 import * as types from './actionTypes'
 
 const initialState = {
-    contacts: [],
+    contacts: {},
     error: null,
-    fetching: false,
+    loading: false,
     openContact: {},
-    currentUser: {}
+    currentUserId: ''
 }
 
 export default (state = initialState, action) => {
@@ -18,36 +18,36 @@ export default (state = initialState, action) => {
         case types.ADD_CONTACT_REQUESTED:
             return {
                 ...state,
-                fetching: true
+                loading: true
             };
         case types.ADD_CONTACT_SUCCEEDED:
             return {
                 ...state,
-                fetching: false,
+                loading: false,
                 contacts: [...state.contacts, action.newContact]
             };
         case types.ADD_CONTACT_FAILED:
             return {
                 ...state,
-                fetching: false,
+                loading: false,
                 error: action.error
             };
         case types.FETCH_CONTACTS_SUCCEEDED:
             return {
                 ...state,
-                fetching: false,
+                loading: false,
                 contacts: action.contacts,
-                currentUser: action.contacts[action.contacts.length - 1]
+                // currentUserId: action.contacts[action.contacts.length - 1]._id
             };
         case types.FETCH_CONTACTS_REQUESTED:
             return {
                 ...state,
-                fetching: true
+                loading: true
             };
         case types.FETCH_CONTACTS_FAILED:
             return {
                 ...state,
-                fetching: false,
+                loading: false,
                 error: action.error
             };
         case types.DELETE_CONTACT_SUCCEEDED:
@@ -56,33 +56,43 @@ export default (state = initialState, action) => {
                 contacts: state.contacts.filter(co => co._id != action.contactId)
             };
         case types.FETCH_CONTACT_DETAILS_REQUESTED:
-            console.log('FETCH_CONTACT_DETAILS_REQUESTED')
             return {
                 ...state,
-                fetching: true
+                loading: true
             };
         case types.FETCH_CONTACT_DETAILS_SUCCEEDED:
             return {
                 ...state,
-                fetching: false,
-                openContact: action.contact
+                loading: false,
+                contacts: state.contacts.map((co) => {
+                    if (co._id === action.contact._id) {
+                        return action.contact
+                    } else {
+                        return co
+                    }
+                })
             };
         case types.FETCH_CONTACT_DETAILS_FAILED:
             return {
                 ...state,
-                fetching: false,
+                loading: false,
                 error: action.error
             };
         case types.COMMENT_CONTACT:
-            const openContact = {
-                ...state.openContact,
-                comments: [...state.openContact.comments, { ...action.comment, by: { name: state.currentUser.name } }]
-            }
-            const contacts = [...state.contacts.filter(co => co._id != openContact._id), openContact]
             return {
                 ...state,
-                openContact,
-                contacts
+                contacts: state.contacts.map(co => {
+                    if (co._id === action.thisContactId) {
+                        return {
+                            ...co,
+                            comments: [
+                                ...co.comments,
+                                ...action.comment
+                            ]
+                        }
+                    } else
+                        return co
+                })
             };
         case types.LIKE_CONTACT:
             return {

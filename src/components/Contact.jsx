@@ -1,48 +1,41 @@
 import React from 'react'
 import FaThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import { connect } from 'react-redux';
+import { fetchContactDetails } from '../actions'
 import * as types from '../actionTypes'
 import axios from 'axios'
 
 class Contact extends React.Component {
     constructor(props) {
         super(props);
-        this.props.dispatch({
-            type: types.FETCH_CONTACT_DETAILS_REQUESTED,
-            contactId: this.props.match.params.id
-        })
+        const urlId = this.props.match.params.id
+        this.props.dispatch(fetchContactDetails(urlId))
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleLike = this.handleLike.bind(this);
         this.handleCommentChange = this.handleCommentChange.bind(this);
         this.state = {
             comment: '',
-            posting: false
+            posting: false,
         }
     }
 
     componentDidUpdate() {
-        // component is not remounted when we switch between contact pages, therefore we trigger data fetch here
-        // if (this.props.openContact._id != this.props.match.params.id) {
-        //     console.log('componentDidUpdate')
-        //     this.props.dispatch({
-        //         type: types.FETCH_CONTACT_DETAILS_REQUESTED,
-        //         contactId: this.props.match.params.id
-        //     })
-        // }
+
     }
 
     handleSubmit(e) {
         e.preventDefault()
         if (this.state.comment != '') {
             this.setState({ posting: true });
-            axios.post('/api/comments/' + this.props.openContact._id, {
+            axios.post('/api/comments/' + this.state.thisContact._id, {
                 text: this.state.comment,
-                by: this.props.currentUser._id
+                by: this.props.currentUserId
             })
                 .then(r => {
                     this.props.dispatch({
                         type: types.COMMENT_CONTACT,
-                        comment: r.data
+                        comment: r.data,
+                        thisContactId: this.state.thisContact._id
                     })
                     this.setState({ posting: false, comment: '' });
                 })
@@ -65,6 +58,10 @@ class Contact extends React.Component {
 
 
     render() {
+
+        // const thisContact = this.props.contacts.find(co => co._id === urlId)
+
+
         return (
             <div>
                 {this.props.fetching ?
@@ -76,18 +73,18 @@ class Contact extends React.Component {
                         </div>
                         :
                         <div>
-                            <h3>{this.props.openContact.name}</h3>
+                            <h3>{this.state.thisContact.name}</h3>
                             <hr />
                             <dl className="row">
                                 <dt className="col-sm-3">Компания</dt>
-                                <dd className="col-sm-9">{this.props.openContact.company}</dd>
+                                <dd className="col-sm-9">{this.state.thisContact.company}</dd>
                                 <dt className="col-sm-3">Должность</dt>
-                                <dd className="col-sm-9">{this.props.openContact.jobTitle}</dd>
+                                <dd className="col-sm-9">{this.state.thisContact.jobTitle}</dd>
                                 <dt className="col-sm-3">Телефон</dt>
-                                <dd className="col-sm-9">{this.props.openContact.phoneNumber}</dd>
+                                <dd className="col-sm-9">{this.state.thisContact.phoneNumber}</dd>
                             </dl>
                             <div>
-                                <a href="#" onClick={this.handleLike} className="btn btn-default btn-sm"><FaThumbsUp /> {this.props.openContact.likes && this.props.openContact.likes.length}</a>
+                                <a href="#" onClick={this.handleLike} className="btn btn-default btn-sm"><FaThumbsUp /> {this.state.thisContact.likes && this.state.thisContact.likes.length}</a>
                             </div>
                             <div>
                                 <hr />
@@ -101,25 +98,25 @@ class Contact extends React.Component {
                                             </fieldset>
                                         </form>
                                     </li>
-                                        {this.props.openContact.comments && this.props.openContact.comments.map(com =>
-                                            <li className="list-group-item" key={com._id}>
-                                                {com.text}
-                                                <footer className="blockquote-footer text-right">{com.by.name}</footer>
-                                            </li>)}
+                                    {this.state.thisContact.comments && this.state.thisContact.comments.map(com =>
+                                        <li className="list-group-item" key={com._id}>
+                                            {com.text}
+                                            <footer className="blockquote-footer text-right">{com.by.name}</footer>
+                                        </li>)}
                                 </ul>
                             </div>
-                            </div>
-                            }
+                        </div>
+                }
             </div>
         )
-                }
-            }
-            
+    }
+}
+
 const mapStateToProps = (state) => ({
-                    openContact: state.openContact,
-                fetching: state.fetching,
-                error: state.error,
-                currentUser: state.currentUser
-            })
-            
+    openContact: state.openContact,
+    fetching: state.fetching,
+    error: state.error,
+    currentUserId: state.currentUserId
+})
+
 export default connect(mapStateToProps)(Contact);

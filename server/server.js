@@ -27,6 +27,7 @@ app.listen(port, function () {
 
 app.get('/api/contacts', function (req, res) {
     Contact.find()
+        .sort('name')
         .then(contacts => { res.send(contacts) })
         .catch((err) => res.send(err));
 })
@@ -34,8 +35,8 @@ app.get('/api/contacts', function (req, res) {
 app.get('/api/contacts/:id', function (req, res) {
     Contact.findById(req.params.id)
         .populate('likes')
-        .populate({ 
-            path: 'comments', 
+        .populate({
+            path: 'comments',
             populate: {
                 path: 'by',
                 model: 'Contact',
@@ -66,26 +67,23 @@ app.post('/api/contacts', function (req, res) {
 })
 
 // creates new comment. Pass contact's ID as param. Returns contact
-app.post('/api/comments/:id', function (req, res) {
-    new Comment(req.body)
-        .save()
-        .then(r => {
-            Contact.findByIdAndUpdate(req.params.id, { $push: { comments: r._id } }).then().catch(err => console.log(err));
-            res.send(r);
-        })
+app.post('/api/postComment/:id', function (req, res) {
+    Contact.findByIdAndUpdate(req.params.id,
+        { $push: { comments: new Comment(req.body) } },
+        { 'new': true })
+        .then(co => res.send(co))
         .catch((err) => res.status(400).send(err));
 })
 
+
 // creates new like. Pass contact's ID as param. Returns contact
-app.post('/api/likes/:id', function (req, res) {
-    new Like(req.body)
-        .save()
-        .then(r => {
-            Contact.findByIdAndUpdate(req.params.id, { $push: { likes: r._id } }).then().catch(err => console.log(err));
-            res.send(r);
-        })
+app.post('/api/postLike/:id', function (req, res) {
+    Contact.findByIdAndUpdate(req.params.id,
+        { $push: { comments: new Like(req.body) } },
+        { 'new': true })
+        .then(co => res.send(co))
         .catch((err) => res.status(400).send(err));
-}) 
+})
 
 app.get('*', function (req, res) {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'))

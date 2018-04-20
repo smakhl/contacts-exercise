@@ -3,7 +3,7 @@ import FaThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import FaComment from 'react-icons/lib/fa/comment';
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
-import * as types from '../actionTypes'
+import { addContact } from '../actions'
 import axios from "axios";
 
 class Contact extends React.Component {
@@ -28,13 +28,10 @@ class Contact extends React.Component {
         e.preventDefault()
         this.setState({ posting: true });
         axios.post('/api/contacts', this.state.newContact).then(r => {
-            this.props.dispatch({
-                type: types.ADD_CONTACT,
-                newContact: r.data
-            })
+            this.props.dispatch(addContact(r.data))
             this.setState({ posting: false, newContactAdded: true });
         })
-        .catch(err => {console.error(err); this.setState({ posting: false })})
+            .catch(err => { console.error(err); this.setState({ posting: false }) })
     }
 
     handleChange(e) {
@@ -68,7 +65,7 @@ class Contact extends React.Component {
                     </div>
                     <input className="btn btn-primary" type="submit" value="Сохранить" />
                 </fieldset>
-                {this.state.newContactAdded && <Redirect to="/"/>}
+                {this.state.newContactAdded && <Redirect to="/" />}
             </form>
         )
     }

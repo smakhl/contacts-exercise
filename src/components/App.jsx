@@ -2,7 +2,7 @@ import React from 'react'
 import ContactsList from './ContactsList.jsx';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Contact from './Contact.jsx';
-import * as types from '../actionTypes'
+import { fetchContactsList } from '../actions'
 import { connect } from 'react-redux';
 import NavBar from './NavBar.jsx'
 import CreateContact from './CreateContact.jsx';
@@ -10,9 +10,7 @@ import CreateContact from './CreateContact.jsx';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.props.dispatch({
-            type: types.FETCH_CONTACTS_REQUESTED
-        })
+        this.props.dispatch(fetchContactsList())
     }
 
     render() {
