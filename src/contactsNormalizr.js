@@ -9,6 +9,5 @@ const contact = new schema.Entity('contacts', {
 
 const contactList = [contact]
 
-const contactsNormalizr = data => normalize(data, contactList);
-
-export default contactsNormalizr
+export const contactsListNormalizr = data => normalize(data, contactList);
+export const contactNormalizr = data => normalize(data, contact)

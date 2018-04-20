@@ -1,6 +1,6 @@
 import { put, takeLatest, all, call } from 'redux-saga/effects'
 import axios from "axios";
-import contactsNormalizr from './contactsNormalizr'
+import { contactNormalizr, contactsListNormalizr } from './contactsNormalizr'
 
 import * as types from './actionTypes'
 
@@ -8,7 +8,7 @@ import * as types from './actionTypes'
 function* fetchContacts() {
     try {
         const data = yield call(axios, "/api/contacts")
-        const normalizedData = contactsNormalizr(data.data)
+        const normalizedData = contactsListNormalizr(data.data)
         console.log(normalizedData)
         yield put({ type: types.FETCH_CONTACTS_SUCCEEDED, contacts: normalizedData })
     } catch (error) {
@@ -30,7 +30,9 @@ function* fetchContactDetails(action) {
     try {
         // console.log('fetchContactDetails',action.contactId)
         const data = yield call(axios, "/api/contacts/" + action.contactId)
-        yield put({ type: types.FETCH_CONTACT_DETAILS_SUCCEEDED, contact: data.data })
+        const normalizedData = contactNormalizr(data.data)
+        console.log(normalizedData)
+        yield put({ type: types.FETCH_CONTACT_DETAILS_SUCCEEDED, contactDetails: normalizedData })
     } catch (error) {
         yield put({ type: types.FETCH_CONTACT_DETAILS_FAILED, error })
     }

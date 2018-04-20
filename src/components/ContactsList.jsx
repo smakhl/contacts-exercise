@@ -3,12 +3,19 @@ import { Link } from 'react-router-dom'
 import ContactListItem from './ContactListItem.jsx';
 import { connect } from 'react-redux';
 import * as types from '../actionTypes'
+import { fetchContactsList } from '../actions'
+
 
 class ContactsList extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.onContactDelete = this.onContactDelete.bind(this)
         this.onContactEdit = this.onContactEdit.bind(this)
+
+    }
+
+    componentDidMount() {
+        this.props.dispatch(fetchContactsList())
     }
 
     onContactDelete(contact) {
@@ -29,28 +36,34 @@ class ContactsList extends React.Component {
     }
 
     render() {
+        const { loading, error, contacts } = this.props;
+
+        if (loading)
+            return <h4>Загрузка...</h4>;
+
+        if (error)
+            return (
+                <div>
+                    <h4>Ошибка подключения</h4>
+                    <p>{error.message}</p>
+                </div>
+            )
+
         return (
             <div>
                 <Link className="btn btn-primary" to={'/contact/add'}>Добавить контакт</Link>
                 <hr />
-                {this.props.loading ?
-                    <h4>Загрузка...</h4> :
-                    this.props.error ?
-                        <div>
-                            <h4>Ошибка подключения</h4>
-                            <p>{this.props.error.message}</p>
-                        </div>
-                        :
-                        this.props.contacts.result
-                            // .sort((a, b) => {
-                            //     var textA = a.name.toUpperCase();
-                            //     var textB = b.name.toUpperCase();
-                            //     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-                            // })
-                            .map(co => {
-                                const contact = this.props.contacts.entities.contacts[co];
-                                return <ContactListItem contact={contact} key={contact._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />
-                            })
+                {
+                    contacts.result && contacts.result
+                        // .sort((a, b) => {
+                        //     var textA = a.name.toUpperCase();
+                        //     var textB = b.name.toUpperCase();
+                        //     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                        // })
+                        .map(co => {
+                            const contact = contacts.entities.contacts[co];
+                            return <ContactListItem contact={contact} key={contact._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />
+                        })
                 }
             </div>
         )

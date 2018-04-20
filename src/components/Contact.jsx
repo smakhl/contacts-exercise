@@ -8,8 +8,7 @@ import axios from 'axios'
 class Contact extends React.Component {
     constructor(props) {
         super(props);
-        const urlId = this.props.match.params.id
-        this.props.dispatch(fetchContactDetails(urlId))
+        this.urlId = this.props.match.params.id
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleLike = this.handleLike.bind(this);
         this.handleCommentChange = this.handleCommentChange.bind(this);
@@ -19,15 +18,15 @@ class Contact extends React.Component {
         }
     }
 
-    componentDidUpdate() {
-
+    componentDidMount() {
+        this.props.dispatch(fetchContactDetails(this.urlId))
     }
 
     handleSubmit(e) {
         e.preventDefault()
         if (this.state.comment != '') {
             this.setState({ posting: true });
-            axios.post('/api/comments/' + this.state.thisContact._id, {
+            axios.post('/api/comments/' + thisContact._id, {
                 text: this.state.comment,
                 by: this.props.currentUserId
             })
@@ -35,7 +34,7 @@ class Contact extends React.Component {
                     this.props.dispatch({
                         type: types.COMMENT_CONTACT,
                         comment: r.data,
-                        thisContactId: this.state.thisContact._id
+                        thisContactId: thisContact._id
                     })
                     this.setState({ posting: false, comment: '' });
                 })
@@ -61,60 +60,71 @@ class Contact extends React.Component {
 
         // const thisContact = this.props.contacts.find(co => co._id === urlId)
 
+        const { loadingDetails, error, contacts } = this.props;
 
-        return (
-            <div>
-                {this.props.fetching ?
-                    <h4>Загрузка...</h4> :
-                    this.props.error ?
-                        <div>
-                            <h4>Ошибка подключения</h4>
-                            <p>{this.props.error.message}</p>
-                        </div>
-                        :
-                        <div>
-                            <h3>{this.state.thisContact.name}</h3>
-                            <hr />
-                            <dl className="row">
-                                <dt className="col-sm-3">Компания</dt>
-                                <dd className="col-sm-9">{this.state.thisContact.company}</dd>
-                                <dt className="col-sm-3">Должность</dt>
-                                <dd className="col-sm-9">{this.state.thisContact.jobTitle}</dd>
-                                <dt className="col-sm-3">Телефон</dt>
-                                <dd className="col-sm-9">{this.state.thisContact.phoneNumber}</dd>
-                            </dl>
-                            <div>
-                                <a href="#" onClick={this.handleLike} className="btn btn-default btn-sm"><FaThumbsUp /> {this.state.thisContact.likes && this.state.thisContact.likes.length}</a>
-                            </div>
-                            <div>
-                                <hr />
-                                <h6>Комментарии</h6>
-                                <ul className="list-group">
-                                    <li className="list-group-item">
-                                        <form>
-                                            <fieldset disabled={this.state.posting ? "disabled" : ""}>
-                                                <textarea className="form-control" type="text" value={this.state.comment} onChange={this.handleCommentChange} />
-                                                <input type="submit" value="Отправить" onClick={this.handleSubmit} className="btn btn-primary btn-sm float-right mt-2" />
-                                            </fieldset>
-                                        </form>
+        if (error)
+            return (
+                <div>
+                    <h4>Ошибка подключения</h4>
+                    <p>{this.props.error.message}</p>
+                </div>
+            )
+
+        if (loadingDetails)
+            return <h4>Загрузка...</h4>
+
+
+        if (contacts.entities && contacts.entities.contacts[this.urlId]) {
+            const thisContact = contacts.entities.contacts[this.urlId];
+            return (
+                <div>
+                    <h3>{thisContact.name}</h3>
+                    <hr />
+                    <dl className="row">
+                        <dt className="col-sm-3">Компания</dt>
+                        <dd className="col-sm-9">{thisContact.company}</dd>
+                        <dt className="col-sm-3">Должность</dt>
+                        <dd className="col-sm-9">{thisContact.jobTitle}</dd>
+                        <dt className="col-sm-3">Телефон</dt>
+                        <dd className="col-sm-9">{thisContact.phoneNumber}</dd>
+                    </dl>
+                    <div>
+                        <a href="#" onClick={this.handleLike} className="btn btn-default btn-sm"><FaThumbsUp /> {thisContact.likes && thisContact.likes.length}</a>
+                    </div>
+                    <div>
+                        <hr />
+                        <h6>Комментарии</h6>
+                        <ul className="list-group">
+                            <li className="list-group-item">
+                                <form>
+                                    <fieldset disabled={this.state.posting ? "disabled" : ""}>
+                                        <textarea className="form-control" type="text" value={this.state.comment} onChange={this.handleCommentChange} />
+                                        <input type="submit" value="Отправить" onClick={this.handleSubmit} className="btn btn-primary btn-sm float-right mt-2" />
+                                    </fieldset>
+                                </form>
+                            </li>
+                            {thisContact.comments && thisContact.comments.map(com => {
+                                const comment = contacts.entities.comments[com];
+                                return (
+                                    <li className="list-group-item" key={comment._id}>
+                                        {comment.text}
+                                        <footer className="blockquote-footer text-right">{comment.by.name}</footer>
                                     </li>
-                                    {this.state.thisContact.comments && this.state.thisContact.comments.map(com =>
-                                        <li className="list-group-item" key={com._id}>
-                                            {com.text}
-                                            <footer className="blockquote-footer text-right">{com.by.name}</footer>
-                                        </li>)}
-                                </ul>
-                            </div>
-                        </div>
-                }
-            </div>
-        )
+                                )
+                            })}
+                        </ul>
+                    </div>
+                </div >
+            )
+        }
+
+        return ''
     }
 }
 
 const mapStateToProps = (state) => ({
-    openContact: state.openContact,
-    fetching: state.fetching,
+    contacts: state.contacts,
+    loadingDetails: state.loadingDetails,
     error: state.error,
     currentUserId: state.currentUserId
 })

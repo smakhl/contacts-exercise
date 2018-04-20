@@ -1,9 +1,12 @@
 import * as types from './actionTypes'
+import merge from 'lodash/merge';
+
 
 const initialState = {
     contacts: {},
     error: null,
     loading: false,
+    loadingDetails: false,
     openContact: {},
     currentUserId: ''
 }
@@ -37,7 +40,7 @@ export default (state = initialState, action) => {
                 ...state,
                 loading: false,
                 contacts: action.contacts,
-                // currentUserId: action.contacts[action.contacts.length - 1]._id
+                currentUserId: action.contacts.result[Math.floor(Math.random() * action.contacts.result.length)]
             };
         case types.FETCH_CONTACTS_REQUESTED:
             return {
@@ -58,24 +61,30 @@ export default (state = initialState, action) => {
         case types.FETCH_CONTACT_DETAILS_REQUESTED:
             return {
                 ...state,
-                loading: true
+                loadingDetails: true
             };
         case types.FETCH_CONTACT_DETAILS_SUCCEEDED:
             return {
                 ...state,
-                loading: false,
-                contacts: state.contacts.map((co) => {
-                    if (co._id === action.contact._id) {
-                        return action.contact
-                    } else {
-                        return co
-                    }
-                })
+                loadingDetails: false,
+                contacts: {
+                    ...state.contacts,
+                    entities: merge({}, state.contacts.entities, action.contactDetails.entities)
+                }
+                // contactDetails
+
+                // contacts: state.contacts.map((co) => {
+                //     if (co._id === action.contact._id) {
+                //         return action.contact
+                //     } else {
+                //         return co
+                //     }
+                // })
             };
         case types.FETCH_CONTACT_DETAILS_FAILED:
             return {
                 ...state,
-                loading: false,
+                loadingDetails: false,
                 error: action.error
             };
         case types.COMMENT_CONTACT:

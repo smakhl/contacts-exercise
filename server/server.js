@@ -47,6 +47,21 @@ app.get('/api/contacts/:id', function (req, res) {
         .catch((err) => res.send(err));
 })
 
+app.get('/api/comments/:id', function (req, res) {
+    Contact.findById(req.params.id)
+        .select('comments')
+        .populate({
+            path: 'comments',
+            populate: {
+                path: 'by',
+                model: 'Contact',
+                select: 'name'
+            }
+        })
+        .then(contact => { res.send(contact) })
+        .catch((err) => res.send(err));
+})
+
 app.delete('/api/contacts/:id', function (req, res) {
     Contact.findByIdAndRemove(req.params.id)
         .then(contact => { res.send(contact) })
