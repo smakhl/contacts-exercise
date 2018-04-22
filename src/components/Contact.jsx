@@ -36,6 +36,7 @@ class Contact extends React.Component {
         e.preventDefault()
         if (this.state.comment != '') {
             this.props.dispatch(addComment(this.urlId, { by: this.props.currentUserId, text: this.state.comment }))
+            this.setState({comment: ''})
         }
     }
 
