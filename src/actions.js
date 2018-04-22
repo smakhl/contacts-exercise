@@ -49,3 +49,9 @@ export function deleteContact(payload) {
     }
 }
 
+export function likeContact(payload) {
+    return {
+        type: types.LIKE_CONTACT_REQUESTED,
+        payload
+    }
+}

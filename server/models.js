@@ -6,7 +6,7 @@ const commentSchema = mongoose.Schema({
 }, { timestamps: true });
 
 const likeSchema = mongoose.Schema({
-    by: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }
+    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }
 }, { timestamps: true });
 
 const contactSchema = mongoose.Schema({
@@ -22,5 +22,3 @@ const contactSchema = mongoose.Schema({
 
 
 module.exports.Contact = mongoose.model('Contact', contactSchema)
-// module.exports.Comment = mongoose.model('Comment', commentSchema)
-// module.exports.Like = mongoose.model('Like', likeSchema)

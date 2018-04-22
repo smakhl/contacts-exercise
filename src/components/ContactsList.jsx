@@ -9,17 +9,10 @@ import { fetchContactsList } from '../actions'
 class ContactsList extends React.Component {
     constructor(props) {
         super(props)
-        this.onContactDelete = this.onContactLike.bind(this)
-
     }
     
     componentDidMount() {
         // this.props.dispatch(fetchContactsList())
-    }
-
-    onContactLike(contact) {
-        console.log('onContactDelete', contact)
-
     }
 
     render() {
@@ -38,8 +31,6 @@ class ContactsList extends React.Component {
 
         return (
             <div>
-                <Link className="btn btn-primary" to={'/contact/add'}>Добавить контакт</Link>
-                <hr />
                 {
                     contacts.result && contacts.result
                         // .sort((a, b) => {

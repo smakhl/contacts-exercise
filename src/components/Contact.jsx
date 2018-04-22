@@ -1,9 +1,9 @@
 import React from 'react'
 import FaThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import { connect } from 'react-redux';
-import { fetchContactDetails, addComment } from '../actions'
-import { deleteContact } from '../actions'
+import { fetchContactDetails, addComment, deleteContact } from '../actions'
 import { Link, Redirect } from 'react-router-dom'
+import LikeButton from './LikeButton.jsx'
 
 const mapStateToProps = (state) => ({
     contacts: state.data.contacts,
@@ -99,7 +99,7 @@ class Contact extends React.Component {
                     </dl>
                     <div className="row">
                         <div className="col-6">
-                            <a href="#" onClick={this.handleLike} className="btn btn-success btn-sm"><FaThumbsUp /> {thisContact.likes && thisContact.likes.length}</a>
+                            <LikeButton contactId={thisContact._id} />
                         </div>
                         <div className="col-6">
                             <div className="float-right">

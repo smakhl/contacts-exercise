@@ -72,20 +72,6 @@ app.post('/api/contacts', function (req, res) {
 
 // creates new comment. Pass contact's ID as param. Returns contact
 app.post('/api/postComment/:id', function (req, res) {
-    // Contact.findById(req.params.id)
-    //     .then(co => {
-    //         console.log(req.body)
-    //         console.log(co.comments.length)
-    //         try {
-    //             co.comments.push(req.body);
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-    //         console.log(co.comments.length)
-    //         return co.save()
-    //     }).then(responce => res.send(responce))
-    //     .catch((err) => res.status(400).send(err));
-
     Contact.findByIdAndUpdate(req.params.id,
         { $push: { comments: req.body } },
         { 'new': true })
@@ -95,9 +81,17 @@ app.post('/api/postComment/:id', function (req, res) {
 
 
 // creates new like. Pass contact's ID as param. Returns contact
-app.post('/api/postLike/:id', function (req, res) {
+app.put('/api/addLike/:id', function (req, res) {
     Contact.findByIdAndUpdate(req.params.id,
-        { $push: { comments: req.body } },
+        { $push: { likes: req.body } },
+        { 'new': true })
+        .then(co => res.send(co))
+        .catch((err) => res.status(400).send(err));
+})
+
+app.put('/api/deleteLike/:id', function (req, res) {
+    Contact.findByIdAndUpdate(req.params.id,
+        { $pull: { likes: req.body } },
         { 'new': true })
         .then(co => res.send(co))
         .catch((err) => res.status(400).send(err));

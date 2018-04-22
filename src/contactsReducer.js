@@ -1,5 +1,6 @@
 import * as types from './actionTypes'
 import merge from 'lodash/merge';
+import assign from 'lodash/assign';
 
 
 const initialState = {
@@ -93,9 +94,41 @@ export default (state = initialState, action) => {
                 loadingDetails: false,
                 error: action.error
             };
-        case types.LIKE_CONTACT:
+        case types.LIKE_CONTACT_REQUESTED:
             return {
                 ...state
+            };
+        case types.LIKE_CONTACT_FAILED:
+            return {
+                ...state,
+                error: action.error
+            };
+        case types.LIKE_CONTACT_SUCCEEDED:
+            const { contactId, likedByCurrentUser, _id } = action.payload;
+            if (likedByCurrentUser) {
+                return {
+                    ...state,
+                    contacts: {
+                        ...state.contacts,
+                        entities: {
+                            ...state.contacts.entities,
+                            contacts: {
+                                ...state.contacts.entities.contacts,
+                                [contactId]: {
+                                    ...state.contacts.entities.contacts[contactId],
+                                    likes: state.contacts.entities.contacts[contactId].likes.filter(l => l != _id)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return {
+                ...state,
+                contacts: {
+                    ...state.contacts,
+                    entities: merge({}, state.contacts.entities, action.payload.contact.entities)
+                }
             };
         case types.ADD_COMMENT_REQUESTED:
             return {
@@ -110,7 +143,7 @@ export default (state = initialState, action) => {
                 loading: false,
                 contacts: {
                     ...state.contacts,
-                    entities: merge({}, state.contacts.entities, action.payload.contact.entities)
+                    entities: merge({}, state.contacts.entities, action.contact.entities)
                 }
             };
         case types.ADD_COMMENT_FAILED:

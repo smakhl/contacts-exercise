@@ -1,9 +1,7 @@
 import { put, takeLatest, all, call } from 'redux-saga/effects'
 import axios from "axios";
 import { contactNormalizr, contactsListNormalizr } from './contactsNormalizr'
-
 import * as types from './actionTypes'
-
 
 function* fetchContacts() {
     try {
@@ -16,7 +14,7 @@ function* fetchContacts() {
 }
 
 function* deleteContact(action) {
-    const {contactId, resolve, reject} = action.payload
+    const { contactId, resolve, reject } = action.payload
     try {
         console.log('delete triggered', contactId)
         yield call([axios, axios.delete], "/api/contacts/" + contactId)
@@ -27,6 +25,7 @@ function* deleteContact(action) {
         reject(error)
     }
 }
+
 
 function* fetchContactDetails(action) {
     try {
@@ -67,14 +66,43 @@ function* addComment(action) {
     try {
         // console.log('newComment',action.payload.newComment)
         const response = yield call([axios, axios.post], "/api/postComment/" + action.payload.contactId, action.payload.newComment);
-        yield put({ type: types.ADD_COMMENT_SUCCEDED, payload: {
-            contact: contactNormalizr(response.data),
-            newComment: action.payload.newComment
-        } })
+        yield put({
+            type: types.ADD_COMMENT_SUCCEDED, payload: {
+                contact: contactNormalizr(response.data),
+                newComment: action.payload.newComment
+            }
+        })
     } catch (error) {
         yield put({ type: types.ADD_COMMENT_FAILED, error })
     }
 }
+
+function* likeContactSaga(action) {
+    try {
+        const { contactId, like, likedByCurrentUser, resolve, reject } = action.payload
+        console.log('likeContactSaga', action)
+        let response
+        if (likedByCurrentUser) {
+            response = yield call([axios, axios.put], "/api/deleteLike/" + contactId, like);
+        } else {
+            response = yield call([axios, axios.put], "/api/addLike/" + contactId, like);
+        }
+
+        yield put({
+            type: types.LIKE_CONTACT_SUCCEEDED, payload: {
+                contact: contactNormalizr(response.data),
+                likedByCurrentUser,
+                contactId,
+                _id: like._id
+            }
+        })
+        resolve(contactNormalizr(response.data))
+    } catch (error) {
+        yield put({ type: types.LIKE_CONTACT_FAILED, error })
+        reject()
+    }
+}
+
 
 
 function* watchFetchContacts() {
@@ -101,6 +129,10 @@ function* watchEditContact() {
     yield takeLatest(types.EDIT_CONTACT_REQUESTED, editContact)
 }
 
+function* watchLikeContact() {
+    yield takeLatest(types.LIKE_CONTACT_REQUESTED, likeContactSaga)
+}
+
 export default function* rootSaga() {
     yield all([
         watchFetchContacts(),
@@ -108,6 +140,7 @@ export default function* rootSaga() {
         watchFetchContactDetails(),
         watchAddContact(),
         watchAddComment(),
-        watchEditContact() 
+        watchEditContact(),
+        watchLikeContact()
     ])
 }
