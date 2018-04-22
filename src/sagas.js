@@ -9,7 +9,6 @@ function* fetchContacts() {
     try {
         const data = yield call(axios, "/api/contacts")
         const normalizedData = contactsListNormalizr(data.data)
-        console.log(normalizedData)
         yield put({ type: types.FETCH_CONTACTS_SUCCEEDED, contacts: normalizedData })
     } catch (error) {
         yield put({ type: types.FETCH_CONTACTS_FAILED, error })
@@ -17,12 +16,15 @@ function* fetchContacts() {
 }
 
 function* deleteContact(action) {
+    const {contactId, resolve, reject} = action.payload
     try {
-        console.log('delete triggered', action.contactId)
-        yield call([axios, axios.delete], "/api/contacts/" + action.contactId)
-        yield put({ type: types.DELETE_CONTACT_SUCCEEDED, contactId: action.contactId })
+        console.log('delete triggered', contactId)
+        yield call([axios, axios.delete], "/api/contacts/" + contactId)
+        yield put({ type: types.DELETE_CONTACT_SUCCEEDED, contactId })
+        resolve()
     } catch (error) {
         yield put({ type: types.DELETE_CONTACT_FAILED, error })
+        reject(error)
     }
 }
 
@@ -31,7 +33,6 @@ function* fetchContactDetails(action) {
         // console.log('fetchContactDetails',action.contactId)
         const data = yield call(axios, "/api/contacts/" + action.contactId)
         const normalizedData = contactNormalizr(data.data)
-        console.log(normalizedData)
         yield put({ type: types.FETCH_CONTACT_DETAILS_SUCCEEDED, contactDetails: normalizedData })
     } catch (error) {
         yield put({ type: types.FETCH_CONTACT_DETAILS_FAILED, error })
@@ -40,13 +41,41 @@ function* fetchContactDetails(action) {
 
 function* addContact(action) {
     try {
-        // console.log('fetchContactDetails',action.contactId)
-        const data = yield call([axios, axios.post], "/api/contacts/" + action.newContact)
-        yield put({ type: types.ADD_CONTACT_SUCCEEDED, contact: data.data })
+        console.log(action)
+        const response = yield call([axios, axios.post], "/api/contacts/", action.payload.newContact)
+        yield put({ type: types.ADD_CONTACT_SUCCEEDED, contact: contactNormalizr(response.data) })
+        action.payload.resolve(contactNormalizr(response.data))
     } catch (error) {
         yield put({ type: types.ADD_CONTACT_FAILED, error })
+        action.payload.reject(error)
     }
 }
+
+function* editContact(action) {
+    try {
+        // console.log('editContact',action.payload)
+        const response = yield call([axios, axios.put], "/api/contacts/" + action.payload.contactId, action.payload.editedContact)
+        yield put({ type: types.EDIT_CONTACT_SUCCEEDED, contact: contactNormalizr(response.data) })
+        action.payload.resolve(response.data)
+    } catch (error) {
+        yield put({ type: types.EDIT_CONTACT_FAILED, error })
+        action.payload.reject(error)
+    }
+}
+
+function* addComment(action) {
+    try {
+        // console.log('newComment',action.payload.newComment)
+        const response = yield call([axios, axios.post], "/api/postComment/" + action.payload.contactId, action.payload.newComment);
+        yield put({ type: types.ADD_COMMENT_SUCCEDED, payload: {
+            contact: contactNormalizr(response.data),
+            newComment: action.payload.newComment
+        } })
+    } catch (error) {
+        yield put({ type: types.ADD_COMMENT_FAILED, error })
+    }
+}
+
 
 function* watchFetchContacts() {
     yield takeLatest(types.FETCH_CONTACTS_REQUESTED, fetchContacts)
@@ -64,11 +93,21 @@ function* watchAddContact() {
     yield takeLatest(types.ADD_CONTACT_REQUESTED, addContact)
 }
 
+function* watchAddComment() {
+    yield takeLatest(types.ADD_COMMENT_REQUESTED, addComment)
+}
+
+function* watchEditContact() {
+    yield takeLatest(types.EDIT_CONTACT_REQUESTED, editContact)
+}
+
 export default function* rootSaga() {
     yield all([
         watchFetchContacts(),
         watchDeleteContact(),
         watchFetchContactDetails(),
-        watchAddContact()
+        watchAddContact(),
+        watchAddComment(),
+        watchEditContact() 
     ])
 }

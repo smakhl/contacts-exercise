@@ -7,39 +7,39 @@ const initialState = {
     error: null,
     loading: false,
     loadingDetails: false,
-    openContact: {},
+    posting: false,
     currentUserId: ''
 }
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case types.ADD_CONTACT:
-            return {
-                ...state,
-                contacts: [...state.contacts, action.newContact]
-            };
         case types.ADD_CONTACT_REQUESTED:
             return {
                 ...state,
-                loading: true
+                posting: false,
             };
         case types.ADD_CONTACT_SUCCEEDED:
+            // console.log('ADD_CONTACT_SUCCEEDED', action)
             return {
                 ...state,
-                loading: false,
-                contacts: [...state.contacts, action.newContact]
+                posting: false,
+                contacts: {
+                    ...state.contacts,
+                    entities: merge({}, state.contacts.entities, action.contact.entities),
+                    result: [...state.contacts.result, action.contact.result]
+                }
             };
         case types.ADD_CONTACT_FAILED:
             return {
                 ...state,
-                loading: false,
+                posting: false,
                 error: action.error
             };
         case types.FETCH_CONTACTS_SUCCEEDED:
             return {
                 ...state,
                 loading: false,
-                contacts: action.contacts,
+                contacts: merge({}, state.contacts, action.contacts),
                 currentUserId: action.contacts.result[Math.floor(Math.random() * action.contacts.result.length)]
             };
         case types.FETCH_CONTACTS_REQUESTED:
@@ -53,10 +53,25 @@ export default (state = initialState, action) => {
                 loading: false,
                 error: action.error
             };
+        case types.DELETE_CONTACT_REQUESTED:
+            return {
+                ...state,
+                loadingDetails: true
+            };
+        case types.DELETE_CONTACT_FAILED:
+            return {
+                ...state,
+                loadingDetails: false,
+                error: action.error
+            };
         case types.DELETE_CONTACT_SUCCEEDED:
             return {
                 ...state,
-                contacts: state.contacts.filter(co => co._id != action.contactId)
+                loadingDetails: false,
+                contacts: {
+                    ...state.contacts,
+                    result: state.contacts.result.filter(co => co != action.contactId)
+                }
             };
         case types.FETCH_CONTACT_DETAILS_REQUESTED:
             return {
@@ -71,15 +86,6 @@ export default (state = initialState, action) => {
                     ...state.contacts,
                     entities: merge({}, state.contacts.entities, action.contactDetails.entities)
                 }
-                // contactDetails
-
-                // contacts: state.contacts.map((co) => {
-                //     if (co._id === action.contact._id) {
-                //         return action.contact
-                //     } else {
-                //         return co
-                //     }
-                // })
             };
         case types.FETCH_CONTACT_DETAILS_FAILED:
             return {
@@ -87,25 +93,52 @@ export default (state = initialState, action) => {
                 loadingDetails: false,
                 error: action.error
             };
-        case types.COMMENT_CONTACT:
-            return {
-                ...state,
-                contacts: state.contacts.map(co => {
-                    if (co._id === action.thisContactId) {
-                        return {
-                            ...co,
-                            comments: [
-                                ...co.comments,
-                                ...action.comment
-                            ]
-                        }
-                    } else
-                        return co
-                })
-            };
         case types.LIKE_CONTACT:
             return {
                 ...state
+            };
+        case types.ADD_COMMENT_REQUESTED:
+            return {
+                ...state,
+                loading: true
+            };
+        case types.ADD_COMMENT_SUCCEDED:
+            console.log('newComment', action.payload.newComment)
+            console.log('contact', action.payload.contact)
+            return {
+                ...state,
+                loading: false,
+                contacts: {
+                    ...state.contacts,
+                    entities: merge({}, state.contacts.entities, action.payload.contact.entities)
+                }
+            };
+        case types.ADD_COMMENT_FAILED:
+            return {
+                ...state,
+                loading: false,
+                error: action.error
+            };
+        case types.EDIT_CONTACT_REQUESTED:
+            return {
+                ...state,
+                posting: true
+            };
+        case types.EDIT_CONTACT_FAILED:
+            return {
+                ...state,
+                posting: false,
+                error: action.error
+            };
+        case types.EDIT_CONTACT_SUCCEEDED:
+            // console.log('EDIT_CONTACT_SUCCEEDED', action)
+            return {
+                ...state,
+                posting: false,
+                contacts: {
+                    ...state.contacts,
+                    entities: merge({}, state.contacts.entities, action.contact.entities)
+                }
             };
         default:
             return state;

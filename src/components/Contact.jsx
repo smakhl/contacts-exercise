@@ -1,9 +1,17 @@
 import React from 'react'
 import FaThumbsUp from 'react-icons/lib/fa/thumbs-up';
 import { connect } from 'react-redux';
-import { fetchContactDetails } from '../actions'
-import * as types from '../actionTypes'
-import axios from 'axios'
+import { fetchContactDetails, addComment } from '../actions'
+import { deleteContact } from '../actions'
+import { Link, Redirect } from 'react-router-dom'
+
+const mapStateToProps = (state) => ({
+    contacts: state.data.contacts,
+    loadingDetails: state.data.loadingDetails,
+    error: state.data.error,
+    currentUserId: state.data.currentUserId,
+    loading: state.data.loading
+})
 
 class Contact extends React.Component {
     constructor(props) {
@@ -15,30 +23,19 @@ class Contact extends React.Component {
         this.state = {
             comment: '',
             posting: false,
+            deleted: false
         }
     }
 
+
     componentDidMount() {
-        this.props.dispatch(fetchContactDetails(this.urlId))
+        // this.props.dispatch(fetchContactDetails(this.urlId))
     }
 
     handleSubmit(e) {
         e.preventDefault()
         if (this.state.comment != '') {
-            this.setState({ posting: true });
-            axios.post('/api/comments/' + thisContact._id, {
-                text: this.state.comment,
-                by: this.props.currentUserId
-            })
-                .then(r => {
-                    this.props.dispatch({
-                        type: types.COMMENT_CONTACT,
-                        comment: r.data,
-                        thisContactId: thisContact._id
-                    })
-                    this.setState({ posting: false, comment: '' });
-                })
-                .catch(err => { console.error(err); this.setState({ posting: false }) })
+            this.props.dispatch(addComment(this.urlId, { by: this.props.currentUserId, text: this.state.comment }))
         }
     }
 
@@ -54,12 +51,18 @@ class Contact extends React.Component {
         })
     }
 
+    handleDelete(e) {
+        e.preventDefault()
+        if (confirm(`Вы уверены, что хотите удалить ${this.props.contacts.entities.contacts[this.urlId].name}?`)) {
+            new Promise((resolve, reject) => {
+                this.props.dispatch(deleteContact({ contactId: this.urlId, resolve, reject }))
+            }).then(_ => this.setState({ deleted: true })).catch(err => console.error(err))
+        }
+    }
+
 
 
     render() {
-
-        // const thisContact = this.props.contacts.find(co => co._id === urlId)
-
         const { loadingDetails, error, contacts } = this.props;
 
         if (error)
@@ -73,6 +76,8 @@ class Contact extends React.Component {
         if (loadingDetails)
             return <h4>Загрузка...</h4>
 
+        if (this.state.deleted)
+            return <Redirect to="/" />
 
         if (contacts.entities && contacts.entities.contacts[this.urlId]) {
             const thisContact = contacts.entities.contacts[this.urlId];
@@ -87,9 +92,22 @@ class Contact extends React.Component {
                         <dd className="col-sm-9">{thisContact.jobTitle}</dd>
                         <dt className="col-sm-3">Телефон</dt>
                         <dd className="col-sm-9">{thisContact.phoneNumber}</dd>
+                        <dt className="col-sm-3">Создан</dt>
+                        <dd className="col-sm-9">{thisContact.createdAt}</dd>
+                        <dt className="col-sm-3">Изменён</dt>
+                        <dd className="col-sm-9">{thisContact.updatedAt}</dd>
                     </dl>
-                    <div>
-                        <a href="#" onClick={this.handleLike} className="btn btn-default btn-sm"><FaThumbsUp /> {thisContact.likes && thisContact.likes.length}</a>
+                    <div className="row">
+                        <div className="col-6">
+                            <a href="#" onClick={this.handleLike} className="btn btn-success btn-sm"><FaThumbsUp /> {thisContact.likes && thisContact.likes.length}</a>
+                        </div>
+                        <div className="col-6">
+                            <div className="float-right">
+                                <button onClick={(e) => this.handleDelete(e)} className="btn btn-danger btn-sm mb-1" >Удалить</button>
+                                {" "}
+                                <Link className="btn btn-secondary btn-sm mb-1" to={'/contact/edit/' + this.urlId}>Редактировать</Link>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <hr />
@@ -97,21 +115,24 @@ class Contact extends React.Component {
                         <ul className="list-group">
                             <li className="list-group-item">
                                 <form>
-                                    <fieldset disabled={this.state.posting ? "disabled" : ""}>
+                                    <fieldset disabled={this.props.loading ? "disabled" : ""}>
                                         <textarea className="form-control" type="text" value={this.state.comment} onChange={this.handleCommentChange} />
                                         <input type="submit" value="Отправить" onClick={this.handleSubmit} className="btn btn-primary btn-sm float-right mt-2" />
                                     </fieldset>
                                 </form>
                             </li>
-                            {thisContact.comments && thisContact.comments.map(com => {
-                                const comment = contacts.entities.comments[com];
-                                return (
-                                    <li className="list-group-item" key={comment._id}>
-                                        {comment.text}
-                                        <footer className="blockquote-footer text-right">{comment.by.name}</footer>
-                                    </li>
-                                )
-                            })}
+                            {contacts.entities.comments && thisContact.comments && thisContact.comments.map(com => {
+                                if (contacts.entities.comments[com]) {
+                                    const comment = contacts.entities.comments[com];
+                                    const commentAuthor = contacts.entities.contacts[comment.by].name;
+                                    return (
+                                        <li className="list-group-item" key={comment._id}>
+                                            {comment.text}
+                                            <footer className="blockquote-footer text-right">{commentAuthor}<br />{comment.createdAt}</footer>
+                                        </li>
+                                    )
+                                }
+                            }).reverse()}
                         </ul>
                     </div>
                 </div >
@@ -121,12 +142,5 @@ class Contact extends React.Component {
         return ''
     }
 }
-
-const mapStateToProps = (state) => ({
-    contacts: state.contacts,
-    loadingDetails: state.loadingDetails,
-    error: state.error,
-    currentUserId: state.currentUserId
-})
 
 export default connect(mapStateToProps)(Contact);

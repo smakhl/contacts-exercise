@@ -9,30 +9,17 @@ import { fetchContactsList } from '../actions'
 class ContactsList extends React.Component {
     constructor(props) {
         super(props)
-        this.onContactDelete = this.onContactDelete.bind(this)
-        this.onContactEdit = this.onContactEdit.bind(this)
+        this.onContactDelete = this.onContactLike.bind(this)
 
     }
-
+    
     componentDidMount() {
-        this.props.dispatch(fetchContactsList())
+        // this.props.dispatch(fetchContactsList())
     }
 
-    onContactDelete(contact) {
+    onContactLike(contact) {
         console.log('onContactDelete', contact)
-        if (confirm(`Вы уверены, что хотите удалить ${contact.name}?`)) {
-            this.props.dispatch({
-                type: types.DELETE_CONTACT_REQUESTED,
-                contactId: contact._id
-            })
-        }
-    }
 
-    onContactEdit(contact) {
-        console.log('onContactEdit', contact)
-        // this.props.dispatch({
-        //     type: types.REMOVE_CONTACT
-        // })
     }
 
     render() {
@@ -62,7 +49,7 @@ class ContactsList extends React.Component {
                         // })
                         .map(co => {
                             const contact = contacts.entities.contacts[co];
-                            return <ContactListItem contact={contact} key={contact._id} onDelete={this.onContactDelete} onEdit={this.onContactEdit} />
+                            return <ContactListItem contact={contact} key={contact._id} onLike={this.onContactLike} />
                         })
                 }
             </div>
@@ -71,9 +58,9 @@ class ContactsList extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    contacts: state.contacts,
-    loading: state.loading,
-    error: state.error
+    contacts: state.data.contacts,
+    loading: state.data.loading,
+    error: state.data.error
 })
 
 export default connect(mapStateToProps)(ContactsList);
