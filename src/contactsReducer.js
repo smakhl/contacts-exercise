@@ -143,7 +143,7 @@ export default (state = initialState, action) => {
                 loading: false,
                 contacts: {
                     ...state.contacts,
-                    entities: merge({}, state.contacts.entities, action.contact.entities)
+                    entities: merge({}, state.contacts.entities, action.payload.contact.entities)
                 }
             };
         case types.ADD_COMMENT_FAILED:
