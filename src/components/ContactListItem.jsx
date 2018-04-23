@@ -18,7 +18,7 @@ export default ({ contact }) => {
                         {' '}
                         <Link title="Комментарии" className="btn btn-secondary btn-sm mb-1" to={'/contact/' + contact._id}><FaComment /> {contact.comments.length}</Link>
                         {' '}
-                        <Link title="Редактировать" className="btn btn-secondary btn-sm mb-1" to={'/contact/' + contact._id}><FaFileText /></Link>
+                        <Link title="Карточка контакта" className="btn btn-secondary btn-sm mb-1" to={'/contact/' + contact._id}><FaFileText /></Link>
                     </div>
                     <div className="col-6">
                         <font size="2" className="font-weight-light float-right">Создан: {contact.createdAt}</font>
